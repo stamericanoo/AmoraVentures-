@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amora Ventures | Ultimate Engineering Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy: #020617;
+            --navy-panel: #0f172a;
+            --maroon: #7f1d1d;
+            --maroon-accent: #dc2626;
+            --white: #f8fafc;
+            --gold: #fbbf24;
+            --slate: #94a3b8;
+        }
+
+        * { scroll-behavior: smooth; box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--navy); color: var(--white); overflow-x: hidden; }
+
+        /* --- CINEMATIC HERO --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(2, 6, 23, 0.8), rgba(127, 29, 29, 0.4)), url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 { font-family: 'Montserrat'; font-size: 7rem; margin: 0; font-weight: 900; letter-spacing: -2px; line-height: 0.9; }
+        .hero h1 span { color: var(--maroon-accent); text-shadow: 0 0 30px rgba(220, 38, 38, 0.5); }
+        .hero p { font-size: 1.5rem; letter-spacing: 5px; text-transform: uppercase; margin-top: 20px; color: var(--slate); }
+        .hero-footer { position: absolute; bottom: 50px; width: 100%; display: flex; justify-content: center; gap: 40px; }
+        .hero-footer div { border-left: 2px solid var(--maroon-accent); padding-left: 15px; text-align: left; }
+        .hero-footer b { display: block; color: var(--gold); font-size: 1.2rem; }
+
+        /* --- NAVIGATION --- */
+        .side-nav { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 20px; background: rgba(15, 23, 42, 0.5); padding: 20px 10px; border-radius: 50px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .dot { width: 10px; height: 10px; background: var(--slate); border-radius: 50%; display: block; transition: 0.4s; position: relative; }
+        .dot:hover::after { content: attr(data-label); position: absolute; right: 25px; top: -5px; background: var(--maroon); padding: 2px 10px; border-radius: 4px; font-size: 10px; white-space: nowrap; }
+        .dot.active { background: var(--maroon-accent); transform: scale(1.8); box-shadow: 0 0 15px var(--maroon-accent); }
+
+        /* --- SECTION SYSTEM --- */
+        section { padding: 120px 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .section-header { margin-bottom: 80px; }
+        .section-header h2 { font-family: 'Montserrat'; font-size: 4rem; margin: 0; font-weight: 900; color: var(--white); }
+        .section-header div { width: 80px; height: 8px; background: var(--maroon-accent); margin-top: 10px; }
+
+        /* --- CONTENT BLOCKS --- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
+        .glass-card { background: var(--navy-panel); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; position: relative; transition: 0.3s; }
+        .glass-card:hover { border-color: var(--maroon-accent); transform: translateY(-5px); }
+        
+        .number-tag { position: absolute; top: -20px; left: 40px; background: var(--maroon-accent); color: white; padding: 5px 20px; font-weight: 800; border-radius: 50px; font-size: 0.8rem; }
+
+        /* --- TABLES --- */
+        .modern-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        .modern-table th { text-align: left; padding: 15px; color: var(--gold); border-bottom: 2px solid var(--maroon); text-transform: uppercase; letter-spacing: 1px; }
+        .modern-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--slate); }
+        .modern-table tr:hover td { color: var(--white); background: rgba(255,255,255,0.02); }
+
+        /* --- CODE & FORMULA --- */
+        .formula-box { background: #000; font-family: 'JetBrains Mono', monospace; padding: 25px; border-radius: 12px; color: #4ade80; border-left: 5px solid var(--maroon-accent); margin: 20px 0; font-size: 1.1rem; box-shadow: inset 0 0 20px rgba(0,255,0,0.05); }
+
+        /* --- CHARTS --- */
+        .chart-container { height: 400px; background: rgba(15, 23, 42, 0.8); padding: 30px; border-radius: 20px; margin-top: 30px; }
+
+        /* --- FOOTER --- */
+        footer { padding: 100px 10%; background: #010409; text-align: center; border-top: 5px solid var(--maroon); }
+        .member-list { display: flex; justify-content: center; gap: 40px; margin-top: 30px; font-weight: 700; color: var(--maroon-accent); }
+
+        /* Animations */
+        [data-aos] { opacity: 0; transform: translateY(30px); transition: 1s ease-out; }
+        .aos-animate { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <nav class="side-nav">
+        <a href="#hero" class="dot active" data-label="Home"></a>
+        <a href="#exec" class="dot" data-label="Executive Summary"></a>
+        <a href="#process" class="dot" data-label="Process Engineering"></a>
+        <a href="#equipment" class="dot" data-label="Assets & Equipment"></a>
+        <a href="#economics" class="dot" data-label="Financial Feasibility"></a>
+        <a href="#safety" class="dot" data-label="SHE Management"></a>
+    </nav>
+
+    <section class="hero" id="hero">
+        <h1 data-aos>AMORA<br><span>VENTURES</span></h1>
+        <p data-aos>Sulfuric Acid Plant | Project Phase 2.0</p>
+        <div class="hero-footer" data-aos>
+            <div><b>CAPACITY</b>1,000 Metric Ton / Day</div>
+            <div><b>TECHNOLOGY</b>DCDA System</div>
+            <div><b>ESTIMATED TCI</b>Rp 1,127,141,720,250</div>
+        </div>
+    </section>
+
+    <section id="exec">
+        <div class="section-header" data-aos>
+            <h2>EXECUTIVE <span>SUMMARY</span></h2>
+            <div></div>
+        </div>
+        <div class="grid-2">
+            <div class="glass-card" data-aos>
+                <div class="number-tag">THE OBJECTIVE</div>
+                <h3>Project Mission</h3>
+                <p>Amora Ventures aims to be the primary supplier of industrial-grade 98% Sulfuric Acid ($H_2SO_4$). By implementing <b>Double Contact Double Absorption</b> technology, we achieve conversion efficiencies exceeding 99.7%, far surpassing conventional single-absorption plants.</p>
+                <ul style="color: var(--slate); line-height: 2;">
+                    <li>High ROI through Medium Pressure Steam Recovery.</li>
+                    <li>Low Emission footprint (< 200 ppm $SO_2$).</li>
+                    <li>Strategic location for regional supply chains.</li>
+                </ul>
+            </div>
+            <div class="glass-card" data-aos style="border-top: 5px solid var(--gold);">
+                <h3>Key Performance Indicators</h3>
+                <table class="modern-table">
+                    <tr><td>Annual Production</td><td>330,000 Metric Tons</td></tr>
+                    <tr><td>Feed Consumption</td><td>181 TPD Molten Sulfur</td></tr>
+                    <tr><td>Annual Revenue</td><td>Rp 660,000,000,000</td></tr>
+                    <tr><td>Net Profit Margin</td><td>14.3% Post-Tax</td></tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" style="background: rgba(127, 29, 29, 0.02);">
+        <div class="section-header" data-aos>
+            <h2>PROCESS <span>ENGINEERING</span></h2>
+            <div></div>
+        </div>
+
+        <div class="glass-card" data-aos style="margin-bottom: 40px;">
+            <div class="number-tag">STEP 01: COMBUSTION</div>
+            <h3>Sulfur Oxidation Furnace (F-101)</h3>
+            <p>Molten sulfur is injected via high-pressure nozzles into a refractory-lined furnace. The atomized sulfur reacts with dehumidified air to generate a high-temperature stream of Sulfur Dioxide ($SO_2$).</p>
+            <div class="formula-box">S(l) + O₂(g) → SO₂(g) + Heat [ΔH = -297 kJ/mol]</div>
+            <p><small>Operational Temp: 1050°C | Material: High-Alumina Refractory Lining</small></p>
+        </div>
+
+        <div class="grid-2">
+            <div class="glass-card" data-aos>
+                <div class="number-tag">STEP 02: CONVERSION</div>
+                <h3>Catalytic Oxidation (R-201)</h3>
+                <p>The 4-pass converter utilizes $V_2O_5$ catalyst beds. $SO_2$ gas is progressively converted to $SO_3$ with inter-stage cooling to maintain favorable thermodynamic equilibrium.</p>
+                <div class="formula-box">2SO₂(g) + O₂(g) ⇌ 2SO₃(g)</div>
+                <p>Converter efficiency is critical for meeting environmental emission standards.</p>
+            </div>
+            <div class="glass-card" data-aos>
+                <div class="number-tag">STEP 03: ABSORPTION</div>
+                <h3>Final Absorption Tower (T-301)</h3>
+                <p>Unlike direct water mixing, $SO_3$ is absorbed into circulating 98% $H_2SO_4$. This prevents the formation of problematic acid mist and allows for controlled hydration.</p>
+                <div class="formula-box">SO₃ + H₂SO₄ → H₂S₂O₇ (Oleum)<br>H₂S₂O₇ + H₂O → 2H₂SO₄</div>
+            </div>
+        </div>
+        
+
+[Image of Contact process for sulfuric acid production flow diagram]
+
+    </section>
+
+    <section id="equipment">
+        <div class="section-header" data-aos>
+            <h2>EQUIPMENT <span>SPECIFICATIONS</span></h2>
+            <div></div>
+        </div>
+        <div class="glass-card" data-aos>
+            <h3>Major Asset Breakdown (CAPEX E)</h3>
+            <table class="modern-table">
+                <thead>
+                    <tr><th>Tag</th><th>Equipment Name</th><th>Primary Material</th><th>Estimated Cost (IDR)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>F-101</td><td>Sulfur Combustion Unit</td><td>C-Steel / Refractory</td><td>26,000,000,000</td></tr>
+                    <tr><td>R-201</td><td>Catalytic Converter</td><td>AISI 304L Stainless</td><td>48,000,000,000</td></tr>
+                    <tr><td>T-301</td><td>Final Absorption Tower</td><td>Acid-Proof Brick</td><td>20,000,000,000</td></tr>
+                    <tr><td>GC-101</td><td>Gas Cleaning System</td><td>Lead-lined Alloys</td><td>36,000,000,000</td></tr>
+                    <tr><td>R-301</td><td>Hydration Reactor</td><td>AISI 316L Stainless</td><td>14,000,000,000</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="chart-container" data-aos>
+            <canvas id="equipChart"></canvas>
+        </div>
+    </section>
+
+    <section id="economics" style="background: rgba(251, 191, 36, 0.02);">
+        <div class="section-header" data-aos>
+            <h2>FINANCIAL <span>FEASIBILITY</span></h2>
+            <div></div>
+        </div>
+        <div class="grid-2">
+            <div class="glass-card" data-aos>
+                <h3>Total Capital Investment (TCI)</h3>
+                <table class="modern-table">
+                    <tr><td>Fixed Capital (FCI)</td><td>Rp 980,123,235,000</td></tr>
+                    <tr><td>Working Capital (WC)</td><td>Rp 147,018,485,250</td></tr>
+                    <tr style="color: var(--white); font-weight: 800;"><td>Total Capital (TCI)</td><td>Rp 1,127,141,720,250</td></tr>
+                </table>
+                <p style="font-size: 0.8rem; margin-top: 20px;">*Calculated based on Lang Factor method for solid-fluid processing plants.</p>
+            </div>
+            <div class="glass-card" data-aos>
+                <h3>Operational Profitability</h3>
+                <div class="chart-container" style="height: 200px;">
+                    <canvas id="profitChart"></canvas>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 20px; text-align: center;">
+                    <div><b style="color: var(--gold); font-size: 1.5rem;">56%</b><p>BEP</p></div>
+                    <div><b style="color: var(--gold); font-size: 1.5rem;">10.3y</b><p>Payback</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="safety">
+        <div class="section-header" data-aos>
+            <h2>SHE <span>MANAGEMENT</span></h2>
+            <div></div>
+        </div>
+        <div class="glass-card" data-aos style="border-left: 10px solid var(--maroon-accent);">
+            <h3>Safety & Risk Mitigation</h3>
+            <p>Amora Ventures operates under strict **Safety Integrity Level (SIL-3)** protocols. Sulfuric acid is highly corrosive and reacts violently with water; hence, operational discipline is paramount.</p>
+            <div class="grid-2" style="margin-top: 30px;">
+                <div>
+                    <h4 style="color: var(--maroon-accent);">Personal Protection (PPE)</h4>
+                    <p>Level A hazmat suits for acid loading areas. Mandatory full-face respirators equipped with $SO_2$ cartridges.</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--maroon-accent);">Engineering Controls</h4>
+                    <p>Automated Emergency Shutdown Valves (ESV) and secondary containment bunds for all bulk storage tanks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <h2 style="font-family: 'Montserrat'; font-size: 3rem;">AMORA VENTURES</h2>
+        <p>Leading the Future of Chemical Manufacturing</p>
+        <div class="member-list">
+            <span>AISHA</span>
+            <span>KEYSHA</span>
+            <span>JOVITA</span>
+        </div>
+        <div style="margin-top: 50px; opacity: 0.4; font-size: 0.8rem;">
+            &copy; 2026 Industrial Plant Design Simulation | All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+        // AOS Implementation
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('aos-animate');
+            });
+        }, observerOptions);
+        document.querySelectorAll('[data-aos]').forEach(el => observer.observe(el));
+
+        // Equipment Chart
+        new Chart(document.getElementById('equipChart'), {
+            type: 'bar',
+            data: {
+                labels: ['F-101', 'R-201', 'T-301', 'GC-101', 'R-301'],
+                datasets: [{
+                    label: 'Cost in Billion IDR',
+                    data: [26, 48, 20, 36, 14],
+                    backgroundColor: '#dc2626'
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }
+            }
+        });
+
+        // Profit Chart
+        new Chart(document.getElementById('profitChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Production Cost', 'Net Profit'],
+                datasets: [{
+                    data: [538.8, 94.5],
+                    backgroundColor: ['#0f172a', '#fbbf24']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Dot Navigation Active State
+        window.addEventListener('scroll', () => {
+            let current = "";
+            const sections = document.querySelectorAll("section");
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) current = section.getAttribute("id");
+            });
+            document.querySelectorAll(".dot").forEach((dot) => {
+                dot.classList.remove("active");
+                if (dot.getAttribute("href").includes(current)) dot.classList.add("active");
+            });
+        });
+    </script>
+</body>
+</html>
